@@ -4,7 +4,7 @@ console.log('🔍 DIAGNOSTIC PRODUCTION COMMUNICONNECT');
 console.log('==========================================\n');
 
 const PRODUCTION_URLS = {
-  client: 'https://communiconnectgn224-kbaysrqw3-alpha-oumar-barry-s-projects.vercel.app',
+  client: 'https://communiconnectgn224-5vo41v1og-alpha-oumar-barry-s-projects.vercel.app',
   server: 'https://communiconnect-authentification.onrender.com'
 };
 

@@ -1,0 +1,3 @@
+[33m9abd81f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m)[m Fix Vercel static file serving for manifest.json
+[33md99bc75[m Simplify Vercel config to fix manifest.json issue
+[33m9720cf8[m Force Vercel redeploy for manifest.json fix
