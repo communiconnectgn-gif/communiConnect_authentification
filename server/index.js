@@ -150,17 +150,7 @@ app.use(cors(corsOptions));
 // Répondre aux pré-requests CORS rapidement
 app.options('*', cors(corsOptions));
 
-// Forcer les headers CORS pour toutes les réponses API (debug dev)
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', process.env.CORS_ORIGIN || 'http://localhost:3000');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(204);
-  }
-  next();
-});
+// Supprimé le middleware CORS manuel qui écrase le CORS wildcard
 
 // Body parsing
 app.use(express.json({ limit: '10mb' }));
