@@ -26,5 +26,6 @@
       "src": "/(.*)",
       "dest": "/index.html"
     }
-  ]
+  ],
+  "domains": ["communiconnectgn224.vercel.app"]
 }
