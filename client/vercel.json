@@ -11,16 +11,20 @@
   ],
   "routes": [
     {
+      "src": "/manifest.json",
+      "dest": "/manifest.json",
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json"
+      }
+    },
+    {
       "src": "/static/(.*)",
       "dest": "/static/$1"
     },
     {
       "src": "/favicon.ico",
       "dest": "/favicon.ico"
-    },
-    {
-      "src": "/manifest.json",
-      "dest": "/manifest.json"
     },
     {
       "src": "/(.*)",
