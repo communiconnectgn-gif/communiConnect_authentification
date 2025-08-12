@@ -21,6 +21,9 @@ const corsOptions = {
     // Ajouter l'origine depuis la variable d'environnement
     if (process.env.CORS_ORIGIN) {
       allowedOrigins.push(process.env.CORS_ORIGIN);
+      console.log('🔧 CORS_ORIGIN ajouté:', process.env.CORS_ORIGIN);
+    } else {
+      console.log('⚠️ CORS_ORIGIN non défini');
     }
     
     // En développement, autoriser localhost et toutes les variantes
@@ -38,9 +41,14 @@ const corsOptions = {
       return callback(null, true);
     }
     
+    console.log('🔍 CORS - Origine demandée:', origin);
+    console.log('🔍 CORS - Origines autorisées:', allowedOrigins);
+    
     if (allowedOrigins.indexOf(origin) !== -1) {
+      console.log('✅ CORS - Origine autorisée:', origin);
       callback(null, true);
     } else {
+      console.log('❌ CORS - Origine refusée:', origin);
       logSecurity('Tentative d\'accès CORS non autorisée', {
         origin,
         allowedOrigins
