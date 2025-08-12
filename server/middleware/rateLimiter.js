@@ -71,7 +71,7 @@ const createRateLimiter = (options = {}) => {
 // Limiteurs spécifiques
 const authLimiter = createRateLimiter({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: process.env.NODE_ENV === 'development' ? 50 : 5, // 50 en dev, 5 en prod
+  max: process.env.NODE_ENV === 'development' ? 200 : 50, // 200 en dev, 50 en prod (au lieu de 5)
   message: 'Trop de tentatives de connexion, réessayez dans 15 minutes',
   keyGenerator: (req) => `auth:${req.ip}`,
   handler: (req, res) => {
