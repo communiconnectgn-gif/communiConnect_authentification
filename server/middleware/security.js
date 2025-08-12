@@ -18,6 +18,11 @@ const corsOptions = {
       'https://www.communiconnect.com'
     ];
     
+    // Ajouter l'origine depuis la variable d'environnement
+    if (process.env.CORS_ORIGIN) {
+      allowedOrigins.push(process.env.CORS_ORIGIN);
+    }
+    
     // En développement, autoriser localhost et toutes les variantes
     if (process.env.NODE_ENV === 'development') {
       allowedOrigins.push(
