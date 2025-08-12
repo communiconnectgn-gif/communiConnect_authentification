@@ -22,6 +22,14 @@ const corsOptions = {
     if (process.env.CORS_ORIGIN) {
       allowedOrigins.push(process.env.CORS_ORIGIN);
       console.log('🔧 CORS_ORIGIN ajouté:', process.env.CORS_ORIGIN);
+      
+      // Ajouter aussi tous les sous-domaines Vercel
+      if (process.env.CORS_ORIGIN.includes('vercel.app')) {
+        const baseDomain = process.env.CORS_ORIGIN.replace('https://', '').split('.')[0];
+        const wildcardDomain = `https://${baseDomain}-*.vercel.app`;
+        allowedOrigins.push(wildcardDomain);
+        console.log('🔧 Domaine wildcard Vercel ajouté:', wildcardDomain);
+      }
     } else {
       console.log('⚠️ CORS_ORIGIN non défini');
     }
@@ -44,16 +52,32 @@ const corsOptions = {
     console.log('🔍 CORS - Origine demandée:', origin);
     console.log('🔍 CORS - Origines autorisées:', allowedOrigins);
     
+    // Vérifier si l'origine est exactement dans la liste
     if (allowedOrigins.indexOf(origin) !== -1) {
-      console.log('✅ CORS - Origine autorisée:', origin);
+      console.log('✅ CORS - Origine autorisée (exacte):', origin);
       callback(null, true);
     } else {
-      console.log('❌ CORS - Origine refusée:', origin);
-      logSecurity('Tentative d\'accès CORS non autorisée', {
-        origin,
-        allowedOrigins
+      // Vérifier les patterns wildcard
+      const isWildcardMatch = allowedOrigins.some(allowedOrigin => {
+        if (allowedOrigin.includes('*')) {
+          const pattern = allowedOrigin.replace('*', '.*');
+          const regex = new RegExp(pattern);
+          return regex.test(origin);
+        }
+        return false;
       });
-      callback(new Error('Non autorisé par CORS'));
+      
+      if (isWildcardMatch) {
+        console.log('✅ CORS - Origine autorisée (wildcard):', origin);
+        callback(null, true);
+      } else {
+        console.log('❌ CORS - Origine refusée:', origin);
+        logSecurity('Tentative d\'accès CORS non autorisée', {
+          origin,
+          allowedOrigins
+        });
+        callback(new Error('Non autorisé par CORS'));
+      }
     }
   },
   credentials: true,
