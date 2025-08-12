@@ -32,10 +32,15 @@ const corsOptions = {
          allowedOrigins.push(wildcardDomain);
          console.log('🔧 Domaine wildcard Vercel ajouté:', wildcardDomain);
          
-         // Ajouter aussi le pattern générique pour tous les projets Vercel
-         const genericWildcard = `https://*-alpha-oumar-barry-s-projects.vercel.app`;
-         allowedOrigins.push(genericWildcard);
-         console.log('🔧 Pattern générique Vercel ajouté:', genericWildcard);
+                   // Ajouter aussi le pattern générique pour tous les projets Vercel
+          const genericWildcard = `https://*-alpha-oumar-barry-s-projects.vercel.app`;
+          allowedOrigins.push(genericWildcard);
+          console.log('🔧 Pattern générique Vercel ajouté:', genericWildcard);
+          
+          // Ajouter un pattern ultra-générique pour TOUS les domaines Vercel
+          const ultraGenericWildcard = `https://*.vercel.app`;
+          allowedOrigins.push(ultraGenericWildcard);
+          console.log('🔧 Pattern ultra-générique Vercel ajouté:', ultraGenericWildcard);
        }
     } else {
       console.log('⚠️ CORS_ORIGIN non défini');
