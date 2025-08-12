@@ -23,13 +23,20 @@ const corsOptions = {
       allowedOrigins.push(process.env.CORS_ORIGIN);
       console.log('🔧 CORS_ORIGIN ajouté:', process.env.CORS_ORIGIN);
       
-      // Ajouter aussi tous les sous-domaines Vercel
-      if (process.env.CORS_ORIGIN.includes('vercel.app')) {
-        const baseDomain = process.env.CORS_ORIGIN.replace('https://', '').split('.')[0];
-        const wildcardDomain = `https://${baseDomain}-*.vercel.app`;
-        allowedOrigins.push(wildcardDomain);
-        console.log('🔧 Domaine wildcard Vercel ajouté:', wildcardDomain);
-      }
+             // Ajouter aussi tous les sous-domaines Vercel
+       if (process.env.CORS_ORIGIN.includes('vercel.app')) {
+         // Extraire le nom de base (avant le premier tiret)
+         const fullDomain = process.env.CORS_ORIGIN.replace('https://', '');
+         const baseName = fullDomain.split('-')[0];
+         const wildcardDomain = `https://${baseName}-*.vercel.app`;
+         allowedOrigins.push(wildcardDomain);
+         console.log('🔧 Domaine wildcard Vercel ajouté:', wildcardDomain);
+         
+         // Ajouter aussi le pattern générique pour tous les projets Vercel
+         const genericWildcard = `https://*-alpha-oumar-barry-s-projects.vercel.app`;
+         allowedOrigins.push(genericWildcard);
+         console.log('🔧 Pattern générique Vercel ajouté:', genericWildcard);
+       }
     } else {
       console.log('⚠️ CORS_ORIGIN non défini');
     }
