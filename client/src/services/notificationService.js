@@ -18,7 +18,7 @@ class NotificationService {
       this.disconnect();
     }
 
-    this.socket = io('http://localhost:5001', {
+    this.socket = io(process.env.REACT_APP_SOCKET_URL || 'https://communiconnect-authentification.onrender.com', {
       auth: {
         userId: userId
       },

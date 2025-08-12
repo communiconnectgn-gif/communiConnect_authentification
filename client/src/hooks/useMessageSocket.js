@@ -18,7 +18,7 @@ const useMessageSocket = () => {
     if (!token || socketRef.current) return;
 
     try {
-      socketRef.current = io(process.env.REACT_APP_API_URL || 'http://localhost:5001', {
+      socketRef.current = io(process.env.REACT_APP_SOCKET_URL || 'https://communiconnect-authentification.onrender.com', {
         auth: {
           token: token
         },
