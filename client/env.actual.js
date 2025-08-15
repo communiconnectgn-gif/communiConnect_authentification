@@ -6,8 +6,8 @@ REACT_APP_GOOGLE_CLIENT_ID=your-google-client-id-here
 REACT_APP_FACEBOOK_CLIENT_ID=your-facebook-client-id-here
 
 // Configuration API
-REACT_APP_API_URL=http://localhost:5000
-REACT_APP_SOCKET_URL=http://localhost:5000
+REACT_APP_API_URL=http://localhost:5001
+REACT_APP_SOCKET_URL=http://localhost:5001
 REACT_APP_ENV=development
 
 // Configuration Firebase (optionnel)

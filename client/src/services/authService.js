@@ -98,6 +98,12 @@ const authService = {
   // Obtenir l'utilisateur actuel
   getCurrentUser: async () => {
     try {
+      // Vérifier si un token existe
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No token found');
+      }
+
       // Si hors-ligne, ne pas appeler l'API et utiliser le profil local
       if (typeof navigator !== 'undefined' && navigator && navigator.onLine === false) {
         const userId = localStorage.getItem('userId');
@@ -120,6 +126,14 @@ const authService = {
       
       return response;
     } catch (error) {
+      // Si erreur 401 (non autorisé), nettoyer le token et rediriger
+      if (error.response?.status === 401) {
+        console.log('🔒 Token invalide, nettoyage de la session');
+        localStorage.removeItem('token');
+        localStorage.removeItem('userId');
+        throw new Error('Token invalide');
+      }
+
       // En cas d'erreur, essayer de récupérer depuis le stockage local
       const userId = localStorage.getItem('userId');
       if (userId) {

@@ -1,13 +1,13 @@
 // Configuration centralisée des URLs de l'API
 const API_CONFIG = {
   // URL de base de l'API
-  BASE_URL: process.env.REACT_APP_API_URL || 'https://communiconnect-authentification.onrender.com',
+  BASE_URL: process.env.REACT_APP_API_URL || 'http://localhost:5001',
   
   // Préfixe de l'API
   API_PREFIX: '/api',
   
   // URL complète de l'API
-  API_URL: `${process.env.REACT_APP_API_URL || 'https://communiconnect-authentification.onrender.com'}/api`,
+  API_URL: `${process.env.REACT_APP_API_URL || 'http://localhost:5001'}/api`,
   
   // Routes d'authentification
   AUTH: {
@@ -22,7 +22,7 @@ const API_CONFIG = {
   },
   
   // URL Socket.IO
-  SOCKET_URL: process.env.REACT_APP_SOCKET_URL || 'https://communiconnect-authentification.onrender.com',
+  SOCKET_URL: process.env.REACT_APP_SOCKET_URL || 'http://localhost:5001',
   
   // Configuration Google OAuth
   GOOGLE: {

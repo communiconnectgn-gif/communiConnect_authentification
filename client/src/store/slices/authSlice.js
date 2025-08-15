@@ -185,8 +185,15 @@ const authSlice = createSlice({
           localStorage.setItem('userId', action.payload.user._id);
         }
       })
-      .addCase(checkAuthStatus.rejected, (state) => {
-        // Ne pas invalider la session locale si la vérification échoue
+      .addCase(checkAuthStatus.rejected, (state, action) => {
+        // Si erreur de token invalide, nettoyer la session
+        if (action.error?.message === 'Token invalide') {
+          state.isAuthenticated = false;
+          state.user = null;
+          state.token = null;
+          localStorage.removeItem('token');
+          localStorage.removeItem('userId');
+        }
         state.loading = false;
       })
       

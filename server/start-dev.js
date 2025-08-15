@@ -1,5 +1,5 @@
 // Script de démarrage pour le mode développement
-process.env.PORT = 5000;
+process.env.PORT = 5001;
 process.env.NODE_ENV = 'development';
 process.env.JWT_SECRET = 'communiconnect-dev-secret-key-2024';
 process.env.JWT_EXPIRE = '7d';

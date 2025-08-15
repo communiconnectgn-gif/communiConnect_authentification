@@ -60,5 +60,5 @@
     "jest": "^27.5.1",
     "react-devtools": "^6.1.5"
   },
-  "proxy": "http://localhost:5000"
+  "proxy": "http://localhost:5001"
 }

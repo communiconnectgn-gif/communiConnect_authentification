@@ -4,8 +4,8 @@
   "description": "Backend API pour CommuniConnect",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
+    "start": "set PORT=5001 && node index.js",
+    "dev": "set PORT=5001 && nodemon index.js",
     "test": "jest",
     "build": "echo 'No build step required for Node.js'",
     "setup": "node scripts/setup-dev.js",

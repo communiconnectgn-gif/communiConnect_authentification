@@ -40,7 +40,7 @@ const AuthCallback = () => {
         }
 
         // Envoyer le code au serveur pour échanger contre un token
-        const API_URL = process.env.REACT_APP_API_URL || 'https://communiconnect-authentification.onrender.com';
+        const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
         const response = await fetch(`${API_URL}/api/auth/oauth/callback`, {
           method: 'POST',
           headers: {
