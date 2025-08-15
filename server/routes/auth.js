@@ -115,7 +115,7 @@ router.post('/register', [
   body('address').notEmpty().trim(),
   body('latitude').isFloat(),
   body('longitude').isFloat()
-], simpleLocationValidation, async (req, res) => {
+], async (req, res) => {
   try {
     console.log('📝 Inscription - Données reçues:', req.body);
     
