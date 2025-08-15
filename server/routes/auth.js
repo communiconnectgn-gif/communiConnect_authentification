@@ -100,7 +100,7 @@ const generateToken = (id) => {
 // @route   POST /api/auth/register
 // @desc    Inscription d'un nouvel utilisateur (réservé aux Guinéens)
 // @access  Public
-router.post('/register', async (req, res) => {
+router.post('/register', simpleLocationValidation, async (req, res) => {
   try {
     console.log('📝 Inscription - Données reçues:', req.body);
     
