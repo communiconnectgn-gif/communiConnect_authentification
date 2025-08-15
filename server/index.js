@@ -40,6 +40,12 @@ const {
 
 require('dotenv').config();
 
+// Configuration MongoDB Atlas pour la production
+if (!process.env.MONGODB_URI) {
+  process.env.MONGODB_URI = 'mongodb+srv://aob_communiconnectgn:Alpha.o.b5@cluster0.7z6yujq.mongodb.net/communiconnect?retryWrites=true&w=majority';
+  console.log('🔧 MONGODB_URI configuré pour la production');
+}
+
 // FORCER le mode développement si pas défini
 if (!process.env.NODE_ENV) {
   process.env.NODE_ENV = 'development';
@@ -58,6 +64,12 @@ if (!process.env.JWT_EXPIRE) {
 
 if (!process.env.CORS_ORIGIN) {
   process.env.CORS_ORIGIN = 'http://localhost:3000';
+}
+
+// Configuration du port par défaut
+if (!process.env.PORT) {
+  process.env.PORT = '5001';
+  console.log('🔧 PORT configuré à 5001 pour le développement');
 }
 
 const path = require('path'); // Added for serving static files
@@ -116,7 +128,7 @@ const notificationService = new NotificationService(server);
 const messageSocketService = new MessageSocketService(io);
 const pushNotificationService = new PushNotificationService();
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 5001;
 
 // Middleware de sécurité CRITIQUE (appliqué en premier)
 app.use(helmetConfig);

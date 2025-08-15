@@ -7,7 +7,7 @@ module.exports = {
   NODE_ENV: 'production',
   
   // Base de données MongoDB Atlas (production)
-  MONGODB_URI: process.env.MONGODB_URI || 'mongodb://localhost:27017/communiconnect',
+  MONGODB_URI: process.env.MONGODB_URI || 'mongodb+srv://aob_communiconnectgn:Alpha.o.b5@cluster0.7z6yujq.mongodb.net/communiconnect?retryWrites=true&w=majority',
   
   // JWT Secret (doit être défini dans les variables d'environnement Render)
   JWT_SECRET: process.env.JWT_SECRET || 'communiconnect-production-jwt-key-2024',
