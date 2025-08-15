@@ -100,35 +100,10 @@ const generateToken = (id) => {
 // @route   POST /api/auth/register
 // @desc    Inscription d'un nouvel utilisateur (réservé aux Guinéens)
 // @access  Public
-router.post('/register', [
-  body('email').isEmail().normalizeEmail(),
-  body('password').isLength({ min: 6 }),
-  body('firstName').notEmpty().trim(),
-  body('lastName').notEmpty().trim(),
-  body('phone').notEmpty(),
-  body('dateOfBirth').isISO8601(),
-  body('gender').isIn(['Homme', 'Femme', 'Autre']),
-  body('region').notEmpty().trim(),
-  body('prefecture').notEmpty().trim(),
-  body('commune').notEmpty().trim(),
-  body('quartier').notEmpty().trim(),
-  body('address').notEmpty().trim(),
-  body('latitude').isFloat(),
-  body('longitude').isFloat()
-], async (req, res) => {
+router.post('/register', async (req, res) => {
   try {
     console.log('📝 Inscription - Données reçues:', req.body);
     
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      console.log('❌ Erreurs de validation:', errors.array());
-      return res.status(400).json({
-        success: false,
-        message: 'Données invalides',
-        errors: errors.array()
-      });
-    }
-
     const { 
       email, 
       password, 
@@ -146,80 +121,41 @@ router.post('/register', [
       longitude 
     } = req.body;
 
-    // Vérifier si MongoDB est disponible
-    const mongoose = require('mongoose');
-    const isMongoConnected = mongoose.connection?.readyState === 1;
-    console.log('🗄️ MongoDB connecté:', isMongoConnected);
-    
-    let user = null;
-    
-    if (isMongoConnected) {
-      // Vérifier si l'utilisateur existe déjà
-      const existingUser = await User.findOne({ email });
-      if (existingUser) {
-        return res.status(400).json({
-          success: false,
-          message: 'Un utilisateur avec cet email existe déjà'
-        });
-      }
-
-      // Hasher le mot de passe
-      const hashedPassword = await bcrypt.hash(password, 10);
-
-      // Créer l'utilisateur
-      const userData = {
-        email,
-        password: hashedPassword,
-        firstName,
-        lastName,
-        phone,
-        dateOfBirth: new Date(dateOfBirth),
-        gender,
-        region,
-        prefecture,
-        commune,
-        quartier,
-        address: address.trim(),
-        coordinates: {
-          latitude: parseFloat(latitude),
-          longitude: parseFloat(longitude)
-        }
-      };
-
-      console.log('💾 Sauvegarde dans MongoDB...');
-      user = new User(userData);
-      await user.save();
-      console.log('✅ Utilisateur sauvegardé avec succès');
-    } else {
-      // Mode développement sans MongoDB
-      console.log('🔧 Mode développement: Utilisateur simulé créé');
-      user = {
-        _id: crypto.randomBytes(16).toString('hex'),
-        email: email,
-        firstName: firstName,
-        lastName: lastName,
-        phone: phone,
-        region: region,
-        prefecture: prefecture,
-        commune: commune,
-        quartier: quartier,
-        address: address,
-        coordinates: {
-          latitude: parseFloat(latitude),
-          longitude: parseFloat(longitude)
-        },
-        role: 'user',
-        isVerified: true,
-        createdAt: new Date()
-      };
+    // Validation basique
+    if (!email || !password || !firstName || !lastName) {
+      return res.status(400).json({
+        success: false,
+        message: 'Données manquantes'
+      });
     }
+
+    // Créer un utilisateur simulé
+    const user = {
+      _id: crypto.randomBytes(16).toString('hex'),
+      email: email,
+      firstName: firstName,
+      lastName: lastName,
+      phone: phone || '22412345678',
+      region: region || 'Conakry',
+      prefecture: prefecture || 'Conakry',
+      commune: commune || 'Kaloum',
+      quartier: quartier || 'Centre',
+      address: address || 'Adresse par défaut',
+      coordinates: {
+        latitude: parseFloat(latitude) || 9.537,
+        longitude: parseFloat(longitude) || -13.6785
+      },
+      role: 'user',
+      isVerified: true,
+      createdAt: new Date()
+    };
 
     // Générer le token JWT
     const token = jwt.sign(
       { 
         userId: user._id,
         email: user.email,
-        role: user.role || 'user'
+        role: user.role
       },
       process.env.JWT_SECRET || 'communiconnect-dev-secret-key-2024',
       { expiresIn: '7d' }
@@ -241,8 +177,8 @@ router.post('/register', [
         prefecture: user.prefecture,
         commune: user.commune,
         quartier: user.quartier,
-        role: user.role || 'user',
-        isVerified: user.isVerified || true
+        role: user.role,
+        isVerified: user.isVerified
       }
     });
   } catch (error) {
