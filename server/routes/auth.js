@@ -2,7 +2,7 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-const { validateGuineanLocation } = require('../middleware/geographicValidation');
+const simpleLocationValidation = require('../middleware/simpleLocationValidation');
 const User = require('../models/User'); // Added missing import for User model
 const bcrypt = require('bcryptjs'); // Added missing import for bcrypt
 const auth = require('../middleware/auth'); // Added missing import for auth middleware
@@ -105,7 +105,7 @@ router.post('/register', [
   body('password').isLength({ min: 6 }),
   body('firstName').notEmpty().trim(),
   body('lastName').notEmpty().trim(),
-  body('phone').notEmpty().isMobilePhone(),
+  body('phone').notEmpty(),
   body('dateOfBirth').isISO8601(),
   body('gender').isIn(['Homme', 'Femme', 'Autre']),
   body('region').notEmpty().trim(),
@@ -115,13 +115,13 @@ router.post('/register', [
   body('address').notEmpty().trim(),
   body('latitude').isFloat(),
   body('longitude').isFloat()
-], validateGuineanLocation, async (req, res) => {
+], simpleLocationValidation, async (req, res) => {
   try {
-    console.log('Données reçues:', req.body);
+    console.log('📝 Inscription - Données reçues:', req.body);
     
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      console.log('Erreurs de validation:', errors.array());
+      console.log('❌ Erreurs de validation:', errors.array());
       return res.status(400).json({
         success: false,
         message: 'Données invalides',
@@ -129,24 +129,32 @@ router.post('/register', [
       });
     }
 
-    const { email, password, firstName, lastName, phone, dateOfBirth, gender, region, prefecture, commune, quartier, address, latitude, longitude } = req.body;
-
-    // Utiliser la localisation validée si disponible
-    const validated = req.validatedLocation || {};
-    const effectiveAddress = (validated.address || address || '').trim();
-    const effectiveLatitude = validated.coordinates?.latitude !== undefined
-      ? validated.coordinates.latitude
-      : parseFloat(latitude);
-    const effectiveLongitude = validated.coordinates?.longitude !== undefined
-      ? validated.coordinates.longitude
-      : parseFloat(longitude);
+    const { 
+      email, 
+      password, 
+      firstName, 
+      lastName, 
+      phone, 
+      dateOfBirth, 
+      gender, 
+      region, 
+      prefecture, 
+      commune, 
+      quartier, 
+      address, 
+      latitude, 
+      longitude 
+    } = req.body;
 
     // Vérifier si MongoDB est disponible
     const mongoose = require('mongoose');
-    console.log('État de la connexion MongoDB:', mongoose.connection.readyState);
+    const isMongoConnected = mongoose.connection?.readyState === 1;
+    console.log('🗄️ MongoDB connecté:', isMongoConnected);
     
-    // Vérifier si l'utilisateur existe déjà (seulement si MongoDB est connecté)
-    if (mongoose.connection.readyState === 1) {
+    let user = null;
+    
+    if (isMongoConnected) {
+      // Vérifier si l'utilisateur existe déjà
       const existingUser = await User.findOne({ email });
       if (existingUser) {
         return res.status(400).json({
@@ -154,50 +162,55 @@ router.post('/register', [
           message: 'Un utilisateur avec cet email existe déjà'
         });
       }
-    }
 
-    // Hasher le mot de passe
-    const hashedPassword = await bcrypt.hash(password, 10);
+      // Hasher le mot de passe
+      const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Créer l'utilisateur
-    const userData = {
-      email,
-      password: hashedPassword,
-      firstName,
-      lastName,
-      phone,
-      dateOfBirth: new Date(dateOfBirth),
-      gender,
-      region,
-      prefecture,
-      commune,
-      quartier,
-      address: effectiveAddress,
-      coordinates: {
-        latitude: effectiveLatitude,
-        longitude: effectiveLongitude
-      }
-    };
+      // Créer l'utilisateur
+      const userData = {
+        email,
+        password: hashedPassword,
+        firstName,
+        lastName,
+        phone,
+        dateOfBirth: new Date(dateOfBirth),
+        gender,
+        region,
+        prefecture,
+        commune,
+        quartier,
+        address: address.trim(),
+        coordinates: {
+          latitude: parseFloat(latitude),
+          longitude: parseFloat(longitude)
+        }
+      };
 
-    // Vérifier si MongoDB est disponible
-    console.log('État de la connexion MongoDB:', mongoose.connection.readyState);
-    
-    let user = null;
-    if (mongoose.connection.readyState === 1) {
-      // MongoDB est connecté, sauvegarder l'utilisateur
-      console.log('Sauvegarde dans MongoDB...');
+      console.log('💾 Sauvegarde dans MongoDB...');
       user = new User(userData);
       await user.save();
-      console.log('Utilisateur sauvegardé avec succès');
+      console.log('✅ Utilisateur sauvegardé avec succès');
     } else {
-      // Mode développement sans MongoDB, simuler une inscription réussie
-      console.log('Mode développement: Utilisateur simulé créé');
+      // Mode développement sans MongoDB
+      console.log('🔧 Mode développement: Utilisateur simulé créé');
       user = {
-        _id: 'dev-user-id',
-        email: userData.email,
-        firstName: userData.firstName,
-        lastName: userData.lastName,
-        role: 'user'
+        _id: crypto.randomBytes(16).toString('hex'),
+        email: email,
+        firstName: firstName,
+        lastName: lastName,
+        phone: phone,
+        region: region,
+        prefecture: prefecture,
+        commune: commune,
+        quartier: quartier,
+        address: address,
+        coordinates: {
+          latitude: parseFloat(latitude),
+          longitude: parseFloat(longitude)
+        },
+        role: 'user',
+        isVerified: true,
+        createdAt: new Date()
       };
     }
 
@@ -206,11 +219,13 @@ router.post('/register', [
       { 
         userId: user._id,
         email: user.email,
-        role: user.role 
+        role: user.role || 'user'
       },
-      process.env.JWT_SECRET || 'your-secret-key',
+      process.env.JWT_SECRET || 'communiconnect-dev-secret-key-2024',
       { expiresIn: '7d' }
     );
+
+    console.log('🎉 Inscription réussie pour:', email);
 
     res.status(201).json({
       success: true,
@@ -221,16 +236,22 @@ router.post('/register', [
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
-        role: user.role
+        phone: user.phone,
+        region: user.region,
+        prefecture: user.prefecture,
+        commune: user.commune,
+        quartier: user.quartier,
+        role: user.role || 'user',
+        isVerified: user.isVerified || true
       }
     });
   } catch (error) {
-    console.error('Erreur lors de l\'inscription:', error);
+    console.error('❌ Erreur lors de l\'inscription:', error);
     console.error('Stack trace:', error.stack);
     res.status(500).json({
       success: false,
       message: 'Erreur serveur lors de l\'inscription',
-      error: error.message
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Erreur interne'
     });
   }
 });
